@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>Vardiya Çizelgesi - TCDD Teknik</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+		:root {
+		--primary-color: #004e92;
+		--secondary-color: #00a896;
+		--accent-color: #ff9900;
+		--bg-color: #f0f4f8;
+		--text-color: #333;
+		--box-bg: #fff;
+		--shadow-light: 0 4px 12px rgba(0, 0, 0, 0.08);
+		--shadow-heavy: 0 8px 24px rgba(0, 0, 0, 0.15);
+		--sidebar-width: 200px;
+		--sidebar-collapsed-width: 0px; 
+	}
+
+    body {
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+        background: var(--bg-color);
+        color: var(--text-color);
+        display: flex;
+        transition: margin-left 0.5s ease;
+    }
+
+    /* Sidebar */
+    .sidebar {
+        height: 100%;
+        width: var(--sidebar-width);
+        background: linear-gradient(180deg, var(--primary-color) 0%, #002c5f 100%);
+        color: white;
+        position: fixed;
+        top: 0;
+        left: 0;
+        padding-top: 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        box-shadow: var(--shadow-heavy);
+        z-index: 1000;
+        transition: width 0.5s ease;
+    }
+
+    .sidebar.collapsed {
+    width: var(--sidebar-collapsed-width);
+    overflow: hidden; /* Taşmayı engeller */
+}
+
+    .sidebar a {
+        width: 100%;
+        padding: 16px 25px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+        transition: background-color 0.4s ease, transform 0.3s ease, color 0.4s ease;
+        border-left: 5px solid transparent;
+        font-size: 16px;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    .sidebar a i {
+        font-size: 20px;
+        width: 30px;
+        text-align: center;
+        transition: color 0.4s ease;
+    }
+
+    .sidebar a:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-left: 5px solid var(--accent-color);
+    }
+
+    .sidebar a:hover i {
+        color: var(--accent-color);
+    }
+
+    /* Daha kolay basılabilir düğme */
+    .toggle-btn {
+		position: fixed;   /* absolute yerine fixed */
+		top: 20px;
+		left: var(--sidebar-width);  /* sidebar genişliği kadar sağa */
+		background: var(--primary-color);
+		color: white;
+		border: none;
+		border-radius: 0 5px 5px 0;
+		padding: 15px;
+		cursor: pointer;
+		font-size: 1.5rem;
+		box-shadow: var(--shadow-light);
+		transition: left 0.5s ease, background 0.3s ease;
+		z-index: 1100;  /* sidebar’dan da önde olsun */
+    }
+	.sidebar.collapsed + .toggle-btn {
+    left: var(--sidebar-collapsed-width); /* sidebar küçülünce sola yapışsın */
+}
+
+    .toggle-btn:hover { background: #002c5f; }
+
+    .content {
+        margin-left: var(--sidebar-width);
+        padding: 20px;
+        width: 100%;
+        transition: margin-left 0.5s ease;
+    }
+
+	.content.shifted {
+		margin-left: var(--sidebar-collapsed-width);
+	}
+
+    /* Diğer mevcut stiller */
+    header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+    header .header-left {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+    header img { height: 60px; }
+    h2 { color: var(--primary-color); margin:0; font-size: 2.2rem;}
+
+    .ayyazi {
+        font-size: 2rem;
+        font-weight: 600;
+        color: var(--primary-color);
+    }
+
+    .container { display: flex; gap: 30px; }
+    #table-container { 
+        overflow:auto; 
+        flex:3; 
+        border-radius: 12px;
+        box-shadow: var(--shadow-light);
+    }
+    #filter-container {
+        flex:1; 
+        padding:5px; 
+        border-radius:20px;
+        background:var(--box-bg); 
+        box-shadow: var(--shadow-light);
+		width: 1% !important;
+    }
+    table {
+        border-collapse: collapse; 
+        width:100%; 
+        table-layout:auto;
+        background:var(--box-bg); 
+        border-radius: 12px; 
+        overflow:hidden;
+        box-shadow: var(--shadow-light);
+    }
+    th, td {
+        border:1px solid #ddd; 
+        text-align:center; 
+        vertical-align:middle;
+        padding:0px; 
+        font-size:12px;
+		height: 30px !important;  /* Hücre yüksekliğini sabitliyoruz */
+    	width: 30px !important;   /* Hücre genişliğini sabitliyoruz */
+    }
+    th {
+        background:var(--primary-color); 
+        color:white; 
+        font-size:12px; 
+        text-transform: uppercase;
+        padding: 10px 5px;
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+    tr:hover { background: #d6e4f0; }
+
+    .person-input {
+        width:180px; 
+        box-sizing:border-box; 
+        font-size:13px; 
+        font-weight:bold;
+        padding:4px; 
+        border:none; 
+        background:transparent;
+    }
+    .person-input:focus { outline:none; background:#d6e4f0; border-radius:4px; }
+    .day-input {
+    	height: 100%;
+        width:100%; 
+        box-sizing:border-box; 
+        text-align:center; 
+        font-size:9px !important; 
+        padding:1px; 
+        border:none; 
+        background:transparent;
+    }
+    .day-input:focus { outline:none; background: #d6e4f0; border-radius:4px; }
+
+    button {
+        padding:8px 16px; 
+        cursor:pointer; 
+        border:none;
+        background:var(--primary-color); 
+        color:white; 
+        font-weight:500; 
+        border-radius:8px;
+        transition: 0.3s ease; 
+        box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+    }
+    button:hover { 
+        background:#1565c0; 
+        transform: translateY(-2px); 
+        box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+    }
+    input[type=number], input[type=text] {
+        border:1px solid #ccc; 
+        border-radius:5px; 
+        padding:5px 8px; 
+        font-size:14px;
+    }
+    .result-box {
+        margin-top: 10px;
+        font-weight: 500;
+        padding: 8px 12px;
+        background: #e9ecef;
+        border-radius: 8px;
+        display: inline-block;
+        color: #0b3d91;
+    }
+
+    /* Çoklu hücre seçimi için */
+    td.selected {
+        outline: 2px solid var(--accent-color) !important;
+        outline-offset: -2px;
+    }
+
+    /* Hafta sonu başlıkları */
+    th.weekend { background-color: #041e4a; }
+
+    /* Vardiya kısaltmaları için açıklama kutusu */
+    .shift-legend {
+        margin-top: 20px;
+        padding: 15px;
+        background: #e9f0f6;
+        border-radius: 12px;
+        border: 1px solid #d1d9e2;
+    }
+    .shift-legend h5 {
+        margin-top: 0;
+        color: var(--primary-color);
+        border-bottom: 1px solid #d1d9e2;
+        padding-bottom: 5px;
+        margin-bottom: 10px;
+    }
+    .shift-legend ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    .shift-legend li {
+        font-size: 13px;
+        color: #555;
+    }
+    .shift-legend span {
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        border-radius: 4px;
+        margin-right: 8px;
+        vertical-align: middle;
+        border: 1px solid #ccc;
+    }
+</style>
+</head>
+<body>
+<div class="sidebar" id="sidebar">
+    <a href="{% url 'home' %}"><i class="fa-solid fa-house"></i> Ana Sayfa</a>
+    <a href="{% url 'vardiya' %}"><i class="fa-solid fa-calendar-alt"></i> Vardiya Listesi</a>
+    <a href="{% url 'arabalar' %}"><i class="fa-solid fa-car-side"></i> Arabalar</a>
+</div>
+	
+	    <button class="toggle-btn" onclick="toggleSidebar()">
+			<i class="fa-solid fa-chevron-left"></i>
+		</button>
+
+<div class="content" id="main-content">
+
+    <header>
+        <div class="header-left">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/7/77/Tcdd_Teknik_Logo.png" alt="Logo">
+            <h2>Vardiya Çizelgesi</h2>
+        </div>
+        <div class="ayyazi">##AY##</div>
+    </header>
+
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; gap: 15px;">
+        <div class="left-section" style="display:flex; flex-wrap: wrap; gap: 10px;">
+            <label>Ay: <input type="number" id="month" min="1" max="12" value="8"></label>
+            <label>Yıl: <input type="number" id="year" value="2025"></label>
+            <button onclick="createTable()">Tablo Oluştur</button>
+            <button onclick="addRow()">Personel Ekle</button>
+            ID Sil: <input type="number" id="deleteId" style="width:50px;">
+            <button onclick="deleteRow()">Sil</button>
+            <button onclick="saveSchedule()">Kaydet</button>
+            <button onclick="loadSchedule()">Yükle</button>
+        </div>
+		<div class="left-section" style="display:flex; flex-wrap: wrap; gap: 10px;">
+    <button onclick="exportSchedule()">Excel Olarak İndir</button>
+</div>
+    </div>
+
+    <div class="container">
+        <div id="table-container"></div>
+        <div id="filter-container">
+            <div style="margin-bottom:20px; border-bottom:1px solid #e0e0e0; padding-bottom:15px;">
+                <h4>Vardiya Arama</h4>
+                <label>ID: <input type="number" id="filterId" style="width:50px"></label>
+                <label>Vardiya: <input type="text" id="filterShiftId" maxlength="2" style="width:40px"></label>
+                <br><br>
+                <button onclick="filterById()">Filtrele</button>
+                <div id="resultId" class="result-box">Toplam Gün: 0</div>
+            </div>
+            
+            <div>
+                <h4>Gün Arama</h4>
+                <label>Gün: <input type="number" id="filterDay" min="1" style="width:40px"></label>
+                <label>Vardiya: <input type="text" id="filterShiftDay" maxlength="2" style="width:40px"></label>
+                <br><br>
+                <button onclick="filterByDay()">Filtrele</button>
+                <div id="resultDay" class="result-box">Toplam Kişi: 0</div>
+            </div>
+            <div style="margin-top: 20px;">
+                <button onclick="clearFilter()">Temizle</button>
+            </div>
+            
+            <div class="shift-legend">
+                <h5>Vardiya Kısaltmaları</h5>
+                <ul>
+                    <li><span style="background:#ffeaa7"></span> S (Sabah)</li>
+                    <li><span style="background:#0984e3"></span> A (Akşam)</li>
+                    <li><span style="background:#dfe6e9"></span> G (Gece)</li>
+                    <li><span style="background:#ff7675"></span> Yİ (İzin)</li>
+                    <li><span style="background:#fd7e14"></span> HT (Hafta Tatili)</li>
+                    <li><span style="background:#55efc4"></span> RT (Resmi Tatil)</li>
+                    <li><span style="background:#07b4ed"></span> Dİ (Doğum İzni)</li>
+                    <li><span style="background:#00ff26"></span> Eİ (Evlilik İzni)</li>
+                    <li><span style="background:#ff9900"></span> EĞ (Eğitim)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentId = 1;
+let tableData = [];
+
+const gunler = ["Pazar", "Pzt", "Sa", "Çrş", "Prş", "Cuma", "Cmt"];
+const shiftColors = {
+    "S": "#ffeaa7", "A": "#0984e3", "G": "#dfe6e9", "Yİ": "#ff7675", "HT": "#fd7e14",
+    "RT": "#55efc4", "Dİ": "#07b4ed", "Eİ": "#00ff26", "EĞ": "#ff9900",
+};
+
+const defaultPeople = [
+"ERSİN TUNÇEL", "TURGAY ÖZCAN", "BURAK EMRE ALBAYRAK", "HAKAN ÇELEBİ", "YAKUP BAK",
+"UĞUR TÜRKER", "CAN MİŞE", "SÜLEYMAN FURKAN KAPLANOĞLU", "HAMZA BİLGİN", "ÖZKAN KIVRAK",
+"ARDA KARAOĞLANOĞLU", "HARUN ARIKUM", "ŞÜKRÜ KADİR YILDIZ", "İBRAHİM DEMİRBAŞ", "BERKAN ÖZBEK",
+"FATİH KÖRİSMAİLOĞLU", "HALİL HENDEN", "ENES ESKİKÖY", "ENES TOK", "EMRAH KEMAL",
+"MEHMET ÖNSÖZ", "ÖMER BİLİR", "ENES KURT", "KADİR BOZKURT", "MEHMET METİN",
+"ERCAN BOZOĞLU", "VEYSEL BÜYÜKTORUN", "SELÇUK SOFU", "ANIL ÇEKİNGEN", "ORHAN HABİP",
+"YUNUS EMRE OKUT", "MEHMET EMİN YILDIZ", "ENVER KEÇECİ", "MERTCAN TEMİZ", "MUSTAFA KARACAN",
+"FATİHHAN BÜLBÜL"
+
+];
+
+function exportSchedule() {
+    const month = document.getElementById("month").value;
+    const year = document.getElementById("year").value;
+    
+    // Yeni API URL'ine yönlendirme
+    window.location.href = `/api/export_schedule_excel/?month=${month}&year=${year}`;
+}
+	
+function getPersistentPeople() {
+    const data = localStorage.getItem("extraPeople");
+    return data ? JSON.parse(data) : [];
+}
+function addPersistentPerson(name) {
+    const people = getPersistentPeople();
+    if (name && !people.includes(name) && !defaultPeople.includes(name)) {
+        people.push(name);
+        localStorage.setItem("extraPeople", JSON.stringify(people));
+    }
+}
+async function markPublicHolidays(month, year) {
+    const res = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/TR`);
+    if (!res.ok) return;
+    const holidays = await res.json();
+    const tbody = document.getElementById("scheduleTable")?.tBodies[0];
+    if (!tbody) return;
+    holidays.forEach(h => {
+        const date = new Date(h.date);
+        if (date.getMonth() + 1 === month) {
+            const day = date.getDate();
+            for (let r = 0; r < tbody.rows.length; r++) {
+                const td = tbody.rows[r].cells[day + 1];
+                td.style.backgroundColor = "#ff9999";
+            }
+        }
+    });
+}
+
+const monthNames = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
+function updateMonthTitle() {
+    const month = parseInt(document.getElementById("month").value);
+    document.querySelector(".ayyazi").textContent = monthNames[month - 1].toUpperCase();
+}
+function createTable() {
+    updateMonthTitle();
+    const month = parseInt(document.getElementById("month").value);
+    const year = parseInt(document.getElementById("year").value);
+    const daysInMonth = new Date(year, month, 0).getDate();
+    let table = '<table id="scheduleTable"><thead><tr><th style="width:40px;">ID</th><th style="width:180px;">Personel</th>';
+    for (let d = 1; d <= daysInMonth; d++) {
+        const weekday = new Date(year, month - 1, d).getDay();
+        const thClass = (weekday === 0 || weekday === 6) ? "weekend" : "";
+        table += `<th class="${thClass}">${d}<br>${gunler[weekday].substr(0, 2)}</th>`;
+    }
+    table += '</tr></thead><tbody></tbody></table>';
+    document.getElementById("table-container").innerHTML = table;
+    currentId = 1;
+    tableData = [];
+    const persistentPeople = getPersistentPeople();
+    const allPeople = [...defaultPeople, ...persistentPeople];
+    allPeople.forEach(person => addRow(person));
+    markPublicHolidays(month, year);
+}
+document.getElementById("month").addEventListener("input", updateMonthTitle);
+function addRow(person = "", shifts = []) {
+    const tbody = document.getElementById("scheduleTable")?.tBodies[0];
+    if (!tbody) { alert("Önce tablo oluştur!"); return; }
+    const cols = document.getElementById("scheduleTable").rows[0].cells.length;
+    const daysCount = cols - 2;
+    const tr = document.createElement("tr");
+    const tdId = document.createElement("td"); tdId.textContent = currentId; tr.appendChild(tdId);
+    const tdPerson = document.createElement("td");
+    const inputPerson = document.createElement("input");
+    inputPerson.className = "person-input";
+    inputPerson.value = person || "Yeni Personel";
+    tdPerson.appendChild(inputPerson);
+    tr.appendChild(tdPerson);
+    for (let i = 0; i < daysCount; i++) {
+        const tdDay = document.createElement("td");
+        const inp = document.createElement("input"); inp.type = "text"; inp.maxLength = 2; inp.className = "day-input"; inp.value = shifts[i] || "";
+        tdDay.appendChild(inp);
+        const weekday = new Date(document.getElementById("year").value, document.getElementById("month").value - 1, i + 1).getDay();
+        tdDay.style.backgroundColor = (weekday === 0 || weekday === 6) ? "#f0f0f0" : "white";
+        if (shifts[i]) tdDay.style.backgroundColor = shiftColors[shifts[i].toUpperCase()] || tdDay.style.backgroundColor;
+        tdDay.style.width = "25px"; tdDay.style.height = "25px";
+        tr.appendChild(tdDay);
+    }
+    tbody.appendChild(tr);
+    tableData.push({ id: tdId.textContent, person: inputPerson.value, shifts: Array(daysCount).fill("").map((v, i) => shifts[i] || "") });
+    currentId++;
+    if (person && !defaultPeople.includes(person)) {
+        addPersistentPerson(person);
+    }
+    inputPerson.addEventListener("change", () => {
+        addPersistentPerson(inputPerson.value);
+    });
+}
+function deleteRow() {
+    const idToDelete = parseInt(document.getElementById("deleteId").value);
+    if (isNaN(idToDelete)) { alert("ID gir!"); return; }
+    const tbody = document.getElementById("scheduleTable")?.tBodies[0];
+    if (!tbody) { alert("Tablo yok!"); return; }
+    let found = false;
+    for (let r = 0; r < tbody.rows.length; r++) {
+        if (parseInt(tbody.rows[r].cells[0].textContent) === idToDelete) {
+            tbody.deleteRow(r); found = true; break;
+        }
+    }
+    tableData = tableData.filter(d => parseInt(d.id) !== idToDelete);
+    if (!found) alert("ID bulunamadı!");
+}
+document.addEventListener("keydown", function (e) {
+    if (e.key === "Tab") {
+        const allInputs = Array.from(document.querySelectorAll(".day-input"));
+        const active = document.activeElement;
+        if (!allInputs.includes(active)) return;
+        e.preventDefault();
+        selectedCells.forEach(inp => inp.parentElement.classList.remove("selected"));
+        selectedCells = [];
+        selectedCells.push(active);
+        active.parentElement.classList.add("selected");
+        let idx = allInputs.indexOf(active);
+        if (e.shiftKey) idx = idx - 1;
+        else idx = idx + 1;
+        if (idx >= 0 && idx < allInputs.length) {
+            allInputs[idx].focus();
+            selectedCells = [allInputs[idx]];
+        }
+    }
+});
+document.addEventListener("input", function (e) {
+    const row = e.target.closest("tr");
+    const rowIndex = parseInt(row.cells[0].textContent) - 1;
+    if (e.target.classList.contains("day-input")) {
+        const val = e.target.value.toUpperCase();
+        const td = e.target.parentElement;
+        td.style.backgroundColor = shiftColors[val] || td.style.backgroundColor;
+        const colIndex = Array.from(row.cells).indexOf(td) - 2;
+        if (tableData[rowIndex]) tableData[rowIndex].shifts[colIndex] = val;
+    }
+    if (e.target.classList.contains("person-input")) {
+        if (tableData[rowIndex]) tableData[rowIndex].person = e.target.value;
+    }
+});
+function filterById() {
+    const filterId = parseInt(document.getElementById("filterId").value);
+    const shift = document.getElementById("filterShiftId").value.toUpperCase();
+    const tbody = document.getElementById("scheduleTable")?.tBodies[0];
+    if (!tbody) return;
+    let count = 0;
+    for (let r = 0; r < tbody.rows.length; r++) {
+        const row = tbody.rows[r];
+        const rowId = parseInt(row.cells[0].textContent);
+        if (rowId === filterId && shift) {
+            const shifts = Array.from(row.cells).slice(2).map(c => c.querySelector('input')?.value.toUpperCase() || "");
+            count = shifts.filter(s => s === shift).length;
+        }
+    }
+    document.getElementById("resultId").textContent = "Toplam Gün: " + count;
+}
+function filterByDay() {
+    const day = parseInt(document.getElementById("filterDay").value);
+    const shift = document.getElementById("filterShiftDay").value.toUpperCase();
+    const tbody = document.getElementById("scheduleTable")?.tBodies[0];
+    if (!tbody) return;
+    let count = 0;
+    for (let r = 0; r < tbody.rows.length; r++) {
+        const row = tbody.rows[r];
+        const val = row.cells[day + 1]?.querySelector('input')?.value.toUpperCase() || "";
+        if (val === shift) count++;
+    }
+    document.getElementById("resultDay").textContent = "Toplam Kişi: " + count;
+}
+function clearFilter() {
+    document.getElementById("resultId").textContent = "Toplam Gün: 0";
+    document.getElementById("resultDay").textContent = "Toplam Kişi: 0";
+    document.getElementById("filterId").value = "";
+    document.getElementById("filterShiftId").value = "";
+    document.getElementById("filterDay").value = "";
+    document.getElementById("filterShiftDay").value = "";
+}
+function saveSchedule() {
+    const month = document.getElementById("month").value;
+    const year = document.getElementById("year").value;
+    const vardiyaVerisi = {
+        month: month,
+        year: year,
+        data: tableData
+    };
+
+    fetch('/api/save_schedule/', { // Burayı değiştirdik!
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify(vardiyaVerisi)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("Vardiya çizelgesi veritabanına kaydedildi!");
+        } else {
+            alert("Kaydetme hatası: " + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Hata:', error);
+        alert('Kaydetme sırasında bir hata oluştu.');
+    });
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.startsWith(name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+function loadSchedule() {
+    const month = document.getElementById("month").value;
+    const year = document.getElementById("year").value;
+    
+    // Django'da oluşturduğumuz API URL'ine istek gönderiyoruz
+    fetch(`/api/load_schedule/?month=${month}&year=${year}`)
+    .then(response => {
+        if (!response.ok) {
+            // Hata durumunda, yanıtı JSON olarak okuyup hatayı fırlat
+            return response.json().then(errorData => {
+                throw new Error(errorData.error || 'Yükleme sırasında bir hata oluştu.');
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            alert("Çizelge başarıyla yüklendi!");
+            
+            // Tabloyu sıfırla ve yeni verilerle doldur
+            document.getElementById("table-container").innerHTML = "";
+            const daysInMonth = new Date(year, month, 0).getDate();
+            let table = '<table id="scheduleTable"><thead><tr><th style="width:40px;">ID</th><th style="width:180px;">Personel</th>';
+            
+            for (let d = 1; d <= daysInMonth; d++) {
+                const weekday = new Date(year, month - 1, d).getDay();
+                const thClass = (weekday === 0 || weekday === 6) ? "weekend" : "";
+                table += `<th class="${thClass}">${d}<br>${gunler[weekday].substr(0, 2)}</th>`;
+            }
+            table += '</tr></thead><tbody></tbody></table>';
+            document.getElementById("table-container").innerHTML = table;
+            
+            tableData = [];
+            currentId = 1;
+            
+            // Veritabanından gelen veriyi kullanarak tabloyu doldur
+            data.data.forEach(row => addRow(row.person, row.shifts));
+            markPublicHolidays(month, year);
+        } else {
+            alert("Yükleme hatası: " + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Hata:', error);
+        alert('Yükleme sırasında bir hata oluştu.');
+    });
+}
+let isSelecting = false;
+let selectedCells = [];
+document.addEventListener("mousedown", e => {
+    if (e.target.tagName === "INPUT" && e.target.classList.contains("day-input")) {
+        if (e.shiftKey) {
+            if (selectedCells.includes(e.target)) {
+                e.target.parentElement.classList.remove("selected");
+                selectedCells = selectedCells.filter(c => c !== e.target);
+            } else {
+                selectedCells.push(e.target);
+                e.target.parentElement.classList.add("selected");
+            }
+        } else {
+            selectedCells.forEach(c => c.parentElement.classList.remove("selected"));
+            selectedCells = [e.target];
+            e.target.parentElement.classList.add("selected");
+            isSelecting = true;
+        }
+        e.preventDefault();
+    }
+});
+document.addEventListener("mouseover", e => {
+    if (isSelecting && e.target.tagName === "INPUT" && e.target.classList.contains("day-input")) {
+        if (!selectedCells.includes(e.target)) {
+            selectedCells.push(e.target);
+            e.target.parentElement.classList.add("selected");
+        }
+    }
+});
+document.addEventListener("mouseup", () => { isSelecting = false; });
+document.addEventListener("keydown", e => {
+    const key = e.key.toUpperCase();
+    let val = "";
+    if (key === "S" || key === "A" || key === "G") val = key;
+    if (key === "H") val = "HT";
+    if (key === "Y") val = "Yİ";
+    if (key === "R") val = "RT";
+    if (key === "D") val = "Dİ";
+    if (key === "E") val = "Eİ";
+    if (key === "T") val = "EĞ";
+    if (val) {
+        selectedCells.forEach(inp => {
+            inp.value = val;
+            const td = inp.parentElement;
+            td.style.backgroundColor = shiftColors[val] || td.style.backgroundColor;
+            const row = inp.closest("tr");
+            const rowIndex = parseInt(row.cells[0].textContent) - 1;
+            const colIndex = Array.from(row.cells).indexOf(td) - 2;
+            if (tableData[rowIndex]) tableData[rowIndex].shifts[colIndex] = val;
+        });
+        selectedCells.forEach(inp => inp.parentElement.classList.remove("selected"));
+        selectedCells = [];
+    }
+});
+function toggleSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    const mainContent = document.getElementById("main-content");
+    const toggleBtnIcon = document.querySelector(".toggle-btn i");
+    sidebar.classList.toggle("collapsed");
+    mainContent.classList.toggle("shifted");
+    if (sidebar.classList.contains("collapsed")) {
+        toggleBtnIcon.classList.replace("fa-chevron-left", "fa-chevron-right");
+    } else {
+        toggleBtnIcon.classList.replace("fa-chevron-right", "fa-chevron-left");
+    }
+}
+</script>
+</body>
+</html>

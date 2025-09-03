@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Araç Takip Formu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #004e92;
+            --secondary-color: #00a896;
+            --accent-color: #ff9900;
+            --bg-color: #f0f4f8;
+            --text-color: #333;
+            --box-bg: #fff;
+            --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-heavy: 0 8px 24px rgba(0, 0, 0, 0.15);
+            --sidebar-width: 200px;
+            --sidebar-collapsed-width: 0px;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-color) 0%, #002c5f 100%);
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: var(--shadow-heavy);
+            z-index: 1000;
+            transition: width 0.5s ease;
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        .sidebar a {
+            width: 100%;
+            padding: 16px 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.4s ease, color 0.4s ease;
+            border-left: 5px solid transparent;
+            font-size: 16px;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .sidebar a i {
+            font-size: 20px;
+            width: 25px;
+            text-align: center;
+            transition: color 0.4s ease;
+        }
+
+        .sidebar a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 5px solid var(--accent-color);
+        }
+
+        .sidebar a:hover i {
+            color: var(--accent-color);
+        }
+
+        /* Toggle Button */
+        .toggle-btn {
+            position: fixed;
+            top: 20px;
+            left: var(--sidebar-width);
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            padding: 15px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            box-shadow: var(--shadow-light);
+            transition: left 0.5s ease, background 0.3s ease;
+            z-index: 1100;
+        }
+
+        .toggle-btn:hover { background: #002c5f; }
+
+        .sidebar.collapsed ~ .toggle-btn {
+            left: var(--sidebar-collapsed-width);
+        }
+
+        .content {
+            margin-left: var(--sidebar-width);
+            padding: 40px;
+            width: 100%;
+            transition: margin-left 0.5s ease;
+        }
+
+        .content.shifted {
+            margin-left: var(--sidebar-collapsed-width);
+        }
+        
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        header .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        header img {
+            height: 60px;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 2.2rem;
+        }
+
+        .form-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .car-form {
+            flex: 1;
+            min-width: 350px;
+            background: var(--box-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: var(--shadow-light);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .car-form h3 {
+            margin: 0 0 10px 0;
+            color: var(--secondary-color);
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+        
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(0, 168, 150, 0.2);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .btn-group button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn-aldim {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-aldim:hover {
+            background-color: #008f82;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-light);
+        }
+
+        .btn-teslim {
+            background-color: var(--accent-color);
+            color: var(--text-color);
+        }
+
+        .btn-teslim:hover {
+            background-color: #e68a00;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-light);
+        }
+
+        .status-message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar" id="sidebar">
+        <a href="{% url 'home' %}"><i class="fa-solid fa-house"></i> Ana Sayfa</a>
+        <a href="{% url 'vardiya' %}"><i class="fa-solid fa-calendar-alt"></i> Vardiya Listesi</a>
+        <a href="{% url 'arabalar' %}"><i class="fa-solid fa-car-side"></i> Arabalar</a>
+    </div>
+
+    <!-- Sidebar dışında toggle button -->
+    <button class="toggle-btn" onclick="toggleSidebar()">
+        <i class="fa-solid fa-chevron-left"></i>
+    </button>
+
+    <div class="content" id="main-content">
+        <header>
+            <div class="header-left">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/7/77/Tcdd_Teknik_Logo.png" alt="Logo">
+                <h2>Araç Takip Formu</h2>
+            </div>
+        </header>
+
+
+<div style="margin-bottom: 30px; display: flex; align-items: center; gap: 20px;">
+    <h3>Lütfen bir araç seçin:</h3>
+    {% for arac in araclar %}
+    <div>
+        <input type="radio" id="select-{{ arac.id }}" name="car-choice" value="{{ arac.id }}" onclick="toggleForms('{{ arac.id }}')">
+        <label for="select-{{ arac.id }}">{{ arac.isim }} ({{ arac.plaka }})</label>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="form-container">
+    {% for arac in araclar %}
+    <div class="car-form" id="form-{{ arac.id }}">
+        <h3>{{ arac.isim }} ({{ arac.plaka }})</h3>
+        <div class="form-group">
+            <label for="personel-{{ arac.id }}">Personel Adı:</label>
+            <input type="text" id="personel-{{ arac.id }}" placeholder="Ad Soyad" required disabled>
+        </div>
+        <div class="btn-group">
+            <button class="btn-aldim" onclick="sendFormData('{{ arac.id }}', 'aldim')" disabled>Aldım</button>
+            <button class="btn-teslim" onclick="sendFormData('{{ arac.id }}', 'teslim')" disabled>Teslim Ettim</button>
+        </div>
+        <div class="form-group">
+            <label for="comment-{{ arac.id }}">Teslim Yorumu (En az 10 karakter):</label>
+            <textarea id="comment-{{ arac.id }}" minlength="10" placeholder="Yorumunuzu girin" disabled></textarea>
+        </div>
+        <div id="status-{{ arac.id }}" class="status-message" style="display:none;"></div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+		function toggleForms(aracId) {
+			const allForms = document.querySelectorAll('.car-form');
+			allForms.forEach(form => {
+				const inputs = form.querySelectorAll('input, textarea, button');
+				const isActive = form.id === `form-${aracId}`;
+				inputs.forEach(input => input.disabled = !isActive);
+			});
+		}
+
+
+async function sendFormData(car, action) {
+    const personelInputId = `personel-${car}`;
+    const commentInputId = `comment-${car}`;
+    const statusMessageId = `status-${car}`;
+
+    const personel = document.getElementById(personelInputId).value;
+    const comment = document.getElementById(commentInputId).value;
+    const statusDiv = document.getElementById(statusMessageId);
+    const now = new Date();
+
+    const aracEl = document.getElementById(`form-${car}`);
+    const aracPlaka = aracEl.querySelector('h3').textContent.split('(')[1].replace(')','').trim();
+
+    statusDiv.style.display = 'none';
+
+    if (!personel) {
+        alert("Lütfen ad soyadınızı girin.");
+        return;
+    }
+
+    try {
+        // En son aracın durumunu kontrol etmek için API çağrısı
+        const statusResponse = await fetch(`/api/arac-durumu/?plaka=${encodeURIComponent(aracPlaka)}`);
+        const currentStatus = await statusResponse.json();
+
+        if (action === 'aldim') {
+            if (currentStatus.success && currentStatus.durum === 'aldim') {
+                statusDiv.textContent = `Bu araç zaten ${currentStatus.personel} tarafından alınmış, tekrar alınamaz.`;
+                statusDiv.style.display = 'block';
+                statusDiv.className = 'status-message status-error';
+                return;
+            }
+        }
+
+        if (action === 'teslim') {
+            if (!currentStatus.success || currentStatus.durum !== 'aldim') {
+                statusDiv.textContent = "Bu araç zaten teslim edilmiş veya hiç alınmamış.";
+                statusDiv.style.display = 'block';
+                statusDiv.className = 'status-message status-error';
+                return;
+            }
+            if (currentStatus.personel !== personel) {
+                statusDiv.textContent = `Bu aracı sadece ${currentStatus.personel} teslim edebilir.`;
+                statusDiv.style.display = 'block';
+                statusDiv.className = 'status-message status-error';
+                return;
+            }
+            if (comment.length < 10) {
+                alert("Teslim işlemi için en az 10 karakterlik bir yorum girmelisiniz.");
+                return;
+            }
+        }
+    } catch (error) {
+        statusDiv.textContent = `Sunucu hatası: Durum sorgulanamadı.`;
+        statusDiv.style.display = 'block';
+        statusDiv.className = 'status-message status-error';
+        console.error("Status check error:", error);
+        return;
+    }
+
+    // Veriyi kaydet
+    const data = {
+        plaka: aracPlaka,
+        personel: personel,
+        durum: action,
+        yorum: comment
+    };
+
+    try {
+        const response = await fetch('/api/arac-takip/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            const message = action === 'aldim'
+                ? `Teslim alma işlemi başarılı! (${now.toLocaleString()})`
+                : `Teslim etme işlemi başarılı! (${now.toLocaleString()})`;
+
+            statusDiv.textContent = message;
+            statusDiv.style.display = 'block';
+            statusDiv.className = 'status-message status-success';
+        } else {
+            statusDiv.textContent = `Hata: ${result.error}`;
+            statusDiv.style.display = 'block';
+            statusDiv.className = 'status-message status-error';
+        }
+    } catch (error) {
+        statusDiv.textContent = `İşlem kaydetme hatası: ${error.message}`;
+        statusDiv.style.display = 'block';
+        statusDiv.className = 'status-message status-error';
+        console.error("POST request error:", error);
+    }
+}
+
+    
+    function toggleSidebar() {
+        const sidebar = document.getElementById("sidebar");
+        const mainContent = document.getElementById("main-content");
+        const toggleBtnIcon = document.querySelector(".toggle-btn i");
+        sidebar.classList.toggle("collapsed");
+        mainContent.classList.toggle("shifted");
+        if (sidebar.classList.contains("collapsed")) {
+            toggleBtnIcon.classList.replace("fa-chevron-left", "fa-chevron-right");
+        } else {
+            toggleBtnIcon.classList.replace("fa-chevron-right", "fa-chevron-left");
+        }
+    }
+</script>
+</body>
+</html>

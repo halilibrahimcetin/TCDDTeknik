@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="tr"><head>
+    <meta charset="UTF-8">
+    <title>TCDD TEKNİK</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #004e92;
+            --secondary-color: #00a8 	96;
+            --accent-color: #ff9900;
+            --bg-color: #f0f4f8;
+            --text-color: #333;
+            --box-bg: #fff;
+            --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-heavy: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            transition: background-color 0.5s ease;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            height: 100vh;
+            width: 200px;
+            background: linear-gradient(180deg, var(--primary-color) 0%, #002c5f 100%);
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding-top: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: var(--shadow-heavy);
+            z-index: 1000;
+            overflow-y: auto;
+            animation: slideInLeft 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+        }
+
+        .sidebar img {
+            width: 120px;
+            margin-bottom: 30px;
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+        }
+
+        .sidebar a {
+            width: 100%;
+            padding: 16px 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.4s ease, transform 0.3s ease, color 0.4s ease;
+            border-left: 5px solid transparent;
+            font-size: 16px;
+        }
+
+        .sidebar a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 5px solid var(--accent-color);
+        }
+
+        .sidebar a i {
+            font-size: 20px;
+            width: 25px;
+            text-align: center;
+            transition: color 0.4s ease;
+        }
+
+        .sidebar a:hover i {
+            color: var(--accent-color);
+        }
+
+        /* Content */
+        .content {
+            margin-left: 200px;
+            padding: 40px;
+            width: 100%;
+            transition: margin-left 0.7s ease;
+            animation: fadeIn 1s cubic-bezier(0.39, 0.575, 0.565, 1) both;
+        }
+
+        /* Başlık kutusu */
+        .page-header {
+            background: var(--box-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-light);
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.8);
+            animation: slideInDown 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+        }
+
+        .page-header h1 {
+            margin: 0;
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        
+        /* Main section */
+        .main-section {
+            background: var(--box-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-light);
+            min-height: 60vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: var(--text-color);
+            animation: scaleIn 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both 0.3s;
+        }
+        
+        .main-section p {
+            font-size: 1.2rem;
+            font-weight: 300;
+            line-height: 1.6;
+            max-width: 700px;
+        }
+
+        /* Animations */
+        @keyframes slideInLeft {
+            0% { transform: translateX(-1000px); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes slideInDown {
+            0% { transform: translateY(-50px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes scaleIn {
+            0% { transform: scale(0.95); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+		<a href="{% url 'home' %}">
+			<i class="fa-solid fa-house"></i>
+			Ana Sayfa
+		</a>
+        <a href="{% url 'vardiya' %}">
+            <i class="fa-solid fa-calendar-alt"></i>
+            Vardiya Listesi
+        </a>
+        <a href="{% url 'arabalar' %}">
+            <i class="fa-solid fa-car-side"></i>
+            Arabalar
+        </a>
+        </div>
+
+    <div class="content">
+        <div class="page-header">
+            <h1 align="center"><img src="https://upload.wikimedia.org/wikipedia/commons/7/77/Tcdd_Teknik_Logo.png"; height="190px"; width="320px";></h1>
+			<iframe width=100% height="60" src="https://rss.app/embed/v1/ticker/dwuzfYM9Jj6kqhq8" frameborder="0"></iframe>
+        </div>
+        
+        <div class="main-section">
+			<iframe width="900" height="1600" src="https://rss.app/embed/v1/magazine/dwuzfYM9Jj6kqhq8" frameborder="0"></iframe>
+        </div>
+    </div>
+</body>
+</html>
